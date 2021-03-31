@@ -2,9 +2,8 @@
 
 namespace App\Http\Resources\v1;
 
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use Illuminate\Support\Facades\Http;
 /** @mixin \App\Models\Post */
 class PostFetchResource extends JsonResource
 {
@@ -14,12 +13,12 @@ class PostFetchResource extends JsonResource
      */
     public function toArray($request)
     {
+        $comments = Http::get('https://jsonplaceholder.typicode.com/comments');
         return [
-            'id' => $this->resource['id'],
-            'title' => $this->resource['title'],
-            'body' => $this->resource['body'],
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
+            'post_id' => $this->resource['id'],
+            'post_title' => $this->resource['title'],
+            'post_body' => $this->resource['body'],
+            'total_number_of_comments' => count(collect($comments->json())->where('postId','=',$this->resource['id'])),
         ];
     }
 }
