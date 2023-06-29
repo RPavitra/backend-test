@@ -15,12 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// fetch posts and comments from the api
-Route::get('/get-posts-and-comments', [PostController::class,'fetch']);
-
 // gets list of top posts with comment counts
 Route::get('/posts', [PostController::class,'index']);
 
 // filter comments based on available fields
-Route::post('/posts/{id}/search',[SearchController::class,'store']);
+Route::get('/posts/{id}/search/{search}',[SearchController::class,'search']);
 

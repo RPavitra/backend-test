@@ -19,9 +19,7 @@ class CommentFetchResource extends JsonResource
             'post_id' => $this->resource['postId'],
             'name' => $this->resource['name'],
             'email' => $this->resource['email'],
-            'body' => $this->resource['body'],
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
+            'body' => $this->resource['body']
         ];
     }
 }
