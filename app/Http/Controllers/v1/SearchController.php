@@ -3,25 +3,24 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Http;
-use App\Http\Resources\v1\CommentFetchResource;
+use App\Http\Requests\v1\SearchRequest;
+use App\Http\Resources\v1\CommentResource;
+use App\Models\Comment;
 class SearchController extends Controller
 {
-    public function search($id,$search)
+    /**
+     * Filters comments based on available fields in comments table
+     */
+    public function store(SearchRequest $request,$id)
     {
-        $search_columns = ['name','email','body']; // add column name into the array if required
-        $search_string = trim($search);
-        $comments = Http::get('https://jsonplaceholder.typicode.com/comments');
-        $comments = collect(CommentFetchResource::collection($comments->json()))->where('post_id','=',$id)->filter(function ($comment) use($search_columns,$search_string){
-            $exists = null;
-            foreach ($search_columns as $search_column) {
-                if (stripos($comment[$search_column],$search_string)) {
-                    $exists = true;
-                    break;
-                }
+        $search_columns = ['post_id','name','email','body']; // add column name into the array if required
+        $search_string = trim($request->validated()['search']);
+        $comments = Comment::wherePostId($id)->where(function ($q) use($search_columns,$search_string){
+            foreach ($search_columns as $column){
+                $q->orWhere($column,'LIKE',"%{$search_string}%");
             }
-            return ($comment == $exists);
-        });
-        return $comments;
+        })->paginate();
+
+        return CommentResource::collection($comments);
     }
 }
